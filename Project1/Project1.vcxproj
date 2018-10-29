@@ -93,7 +93,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>D:\Tool\mysql-5.7.23-winx64\lib;d:\VSSpace\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libmysql.lib;libarcsoft_fsdk_face_tracking.lib;libarcsoft_fsdk_face_recognition.lib;libarcsoft_fsdk_gender_estimation.lib;libarcsoft_fsdk_age_estimation.lib;libarcsoft_fsdk_face_detection.lib;opencv_world343d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libarcsoft_fsdk_face_tracking.lib;libarcsoft_fsdk_face_recognition.lib;libarcsoft_fsdk_gender_estimation.lib;libarcsoft_fsdk_age_estimation.lib;libarcsoft_fsdk_face_detection.lib;opencv_world343d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
