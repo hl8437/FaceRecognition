@@ -8,7 +8,7 @@
 #include "ReadBMP.h"
 #include "Engines.h"
 #include <stdlib.h>
-#include "SQLEngine.h"
+//#include "SQLEngine.h"
 #include "ammem.h"
 #include <string>
 
