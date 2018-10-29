@@ -134,6 +134,7 @@
     <ClCompile Include="SQLEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\lib\ammem.h" />
     <ClInclude Include="AgeEngine.h" />
     <ClInclude Include="const.h" />
     <ClInclude Include="Engines.h" />

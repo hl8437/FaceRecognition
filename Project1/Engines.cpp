@@ -220,24 +220,25 @@ int Engines::getFaceInputFromBMP()
 	}
 	offInput1.pi32Pitch[0] = offInput1.i32Width * 3;
 	
-	LPAFD_FSDK_FACERES localFaceRes1 = nullptr;
-	AFR_FSDK_FACEINPUT localFaceResult;
-	mFDEngine->FaceDetection(&offInput1, &localFaceRes1);
-	localFaceResult.lOrient = *(localFaceRes1->lfaceOrient);
-	localFaceResult.rcFace = *(localFaceRes1->rcFace);	
-	localFaceResult.lOrient = *(localFaceRes1->lfaceOrient);
-	localFaceResult.rcFace = *(localFaceRes1->rcFace);
-	//AFR_FSDK_FACEMODEL localFaceModels1 = { 0 };
-	//AFR_FSDK_FACEMODEL LocalFaceModels = { 0 };
+	LPAFD_FSDK_FACERES localFaceRes = nullptr;
+	AFR_FSDK_FACEINPUT localFRInput;
+	mFDEngine->FaceDetection(&offInput1, &localFaceRes);
+	localFRInput.lOrient = *(localFaceRes->lfaceOrient);
+	localFRInput.rcFace = *(localFaceRes->rcFace);	
+	localFRInput.lOrient = *(localFaceRes->lfaceOrient);
+	localFRInput.rcFace = *(localFaceRes->rcFace);
+	
+	AFR_FSDK_FACEMODEL localFaceModel = { 0 };
+	AFR_FSDK_FACEMODEL LocalFaceModels = { 0 };
 
-	//nRet = frEngine.ExtractFRFeature(&offInput1, &localFaceResult, &LocalFaceModels);
-	//if (nRet != MOK)
-	//{
-	//	fprintf(stderr, "fail to Extract 1st FR Feature, errorcode: %d\r\n", nRet);
-	//}
-	//localFaceModels1.lFeatureSize = LocalFaceModels.lFeatureSize;
-	//localFaceModels1.pbFeature = (MByte*)malloc(localFaceModels1.lFeatureSize);
-	//memcpy(localFaceModels1.pbFeature, LocalFaceModels.pbFeature, localFaceModels1.lFeatureSize);
+	extractFRFeatureRet = mFREngine->ExtractFRFeature(&offInput1, &localFRInput, &localFaceModel);
+	if (extractFRFeatureRet != MOK)
+	{
+		return extractFRFeatureRet;
+	}
+	LocalFaceModels.lFeatureSize = localFaceModel.lFeatureSize;
+	LocalFaceModels.pbFeature = (MByte*)malloc(localFaceModel.lFeatureSize);
+	memcpy(LocalFaceModels.pbFeature, localFaceModel.pbFeature, localFaceModel.lFeatureSize);
 
 	//AFR_FSDK_FACEINPUT tempFaceResult;
 	//AFR_FSDK_FACEMODEL tempFaceModels = { 0 };
