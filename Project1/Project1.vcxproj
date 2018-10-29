@@ -42,7 +42,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -69,7 +69,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>D:\Tool\mysql-5.7.23-winx64\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -84,12 +86,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>d:\VSSpace\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Tool\mysql-5.7.23-winx64\lib;d:\VSSpace\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>d:\VSSpace\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libarcsoft_fsdk_face_tracking.lib;libarcsoft_fsdk_face_recognition.lib;libarcsoft_fsdk_gender_estimation.lib;libarcsoft_fsdk_age_estimation.lib;libarcsoft_fsdk_face_detection.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Tool\mysql-5.7.23-winx64\lib;d:\VSSpace\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libmysql.lib;libarcsoft_fsdk_face_tracking.lib;libarcsoft_fsdk_face_recognition.lib;libarcsoft_fsdk_gender_estimation.lib;libarcsoft_fsdk_age_estimation.lib;libarcsoft_fsdk_face_detection.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,6 +131,7 @@
     <ClCompile Include="GenderEngine.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ReadBMP.cpp" />
+    <ClCompile Include="SQLEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AgeEngine.h" />
@@ -141,6 +144,7 @@
     <ClInclude Include="merror.h" />
     <ClInclude Include="ReadBMP.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SQLEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Project1.rc" />
@@ -149,6 +153,14 @@
     <Image Include="photo1.bmp" />
     <Image Include="photo2.bmp" />
     <Image Include="temp.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libarcsoft_fsdk_age_estimation.dll" />
+    <None Include="libarcsoft_fsdk_face_detection.dll" />
+    <None Include="libarcsoft_fsdk_face_recognition.dll" />
+    <None Include="libarcsoft_fsdk_face_tracking.dll" />
+    <None Include="libarcsoft_fsdk_gender_estimation.dll" />
+    <None Include="libmysql.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

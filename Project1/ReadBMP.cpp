@@ -39,8 +39,8 @@ bool readBMP(const char * path, uint8_t ** imageData, int * pWidth, int * pHeigh
 	}
 	else if (32 == biBitCount)
 	{
-		*imageData = (uint8_t *)malloc((*pWidth) * (*pHeight) * 3);
-		uint8_t * data = (uint8_t *)malloc((*pWidth) * (*pHeight) * 4);
+		*imageData = (uint8_t *) malloc ((*pWidth) * (*pHeight) * 3);
+		uint8_t * data = (uint8_t *) malloc ((*pWidth) * (*pHeight) * 4);
 		fseek(fp, 54, SEEK_SET);
 		fread(data, 1, (*pWidth) * (*pHeight) * 4, fp);
 		for (int i = 0; i < *pHeight; i++)

@@ -39,6 +39,9 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SQLEngine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="const.h">
@@ -71,6 +74,9 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SQLEngine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Project1.rc">
@@ -87,5 +93,25 @@
     <Image Include="photo2.bmp">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="libarcsoft_fsdk_age_estimation.dll">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="libarcsoft_fsdk_face_detection.dll">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="libarcsoft_fsdk_face_recognition.dll">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="libarcsoft_fsdk_face_tracking.dll">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="libarcsoft_fsdk_gender_estimation.dll">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="libmysql.dll">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
