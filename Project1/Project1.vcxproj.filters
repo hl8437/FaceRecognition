@@ -77,9 +77,6 @@
     <ClInclude Include="SQLEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\lib\ammem.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Project1.rc">
