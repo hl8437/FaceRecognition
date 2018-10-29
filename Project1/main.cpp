@@ -45,7 +45,7 @@ int main() {
 
 	std::cout << "进入主功能" << std::endl;
 	cv::waitKey(1000);
-	/* 主功能实现 66666666666*/
+	/* 主功能实现 */
 	while (true)
 	{
 		

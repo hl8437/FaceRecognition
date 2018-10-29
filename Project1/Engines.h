@@ -40,12 +40,16 @@ protected:
 	AFR_FSDK_FACEINPUT mFRFaceInput;				// FREngine 输入
 	AFR_FSDK_FACEMODEL mFRFaceModel;				// FREngine 提取结果
 
-	AFR_FSDK_FACEINPUT localFRFaceInput;			//	本地人脸输入
-	AFR_FSDK_FACEMODEL localFRFaceModel;			//	本地人脸模型
+	AFR_FSDK_FACEMODEL LocalFaceModels;				// 预设置为本地人脸模型队列
+
+	AFR_FSDK_FACEMODEL videoFaceModels;				// 从视频提取的人脸模型
+
+	MFloat tempFimiliar;			// 人脸比对相似度
+
 
 	MRESULT faceTrackingRet;		// 检测人脸函数返回值
 	MRESULT extractFRFeatureRet;	// 模型提取返回值
-
+	MRESULT facePairMatchingRet;	// 人脸比对返回值
 
 public:
 	Engines();
@@ -67,7 +71,10 @@ public:
 
 	MRESULT extractFRFeature();
 
-	int getFaceInputFromBMP();
+	int getFaceModelFromBMP();
+	int getVideoFaceModel();
+
+	int faceRecognitionOneToOne();
 
 	
 	void drawFaceRect();			// 人脸框绘制函数
