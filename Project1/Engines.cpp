@@ -160,6 +160,7 @@ int Engines::initRet()
 
 int Engines::cameraToOffInput()
 {
+	
 	mCapture >> *mFrame;
 	mOffInput.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
 	mOffInput.i32Width = mFrame->cols;
@@ -216,6 +217,7 @@ int Engines::getFaceModelFromBMP()
 	ASVLOFFSCREEN offInput1 = { 0 };
 	offInput1.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
 	offInput1.ppu8Plane[0] = nullptr;
+
 	readBMP("photo1.bmp", (uint8_t**)&offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
 	if (!offInput1.ppu8Plane[0])
 	{
@@ -239,6 +241,8 @@ int Engines::getFaceModelFromBMP()
 		return extractFRFeatureRet;
 	}
 	LocalFaceModels.lFeatureSize = localFaceModel.lFeatureSize;
+
+	/* 可能引发内存泄漏 */
 	LocalFaceModels.pbFeature = (MByte*)malloc(localFaceModel.lFeatureSize);
 	memcpy(LocalFaceModels.pbFeature, localFaceModel.pbFeature, localFaceModel.lFeatureSize);
 
@@ -265,6 +269,8 @@ int Engines::getVideoFaceModel()
 	}
 
 	videoFaceModels.lFeatureSize = videoFaceModel.lFeatureSize;
+	
+	/* 引发内存泄漏点，未处理*/
 	videoFaceModels.pbFeature = (MByte*)malloc(videoFaceModel.lFeatureSize);
 	memcpy(videoFaceModels.pbFeature, videoFaceModel.pbFeature, videoFaceModel.lFeatureSize);
 

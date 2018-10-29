@@ -28,7 +28,7 @@ protected:
 	int CAP_HEIGHT;				// 摄像头高度
 	cv::Mat* mFrame;				// 帧结构？
 	
-
+public:
 	ASVLOFFSCREEN mOffInput;						// engines图像输入
 	LPAFT_FSDK_FACERES mFaceRes;					// 人脸检测结果
 	ASGE_FSDK_GENDERFACEINPUT mGenderFaceInput;		// gender engine 输入
