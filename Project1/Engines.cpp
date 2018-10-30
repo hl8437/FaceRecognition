@@ -127,6 +127,10 @@ int Engines::initFaceVariables()
 	/* FREngine 提取的模型 */
 	mFRFaceModel = { 0 };
 
+	LocalFaceModels = { 0 };
+
+	videoFaceModels = { 0 };
+
 	return 0;
 }
 
@@ -156,6 +160,7 @@ int Engines::initRet()
 
 int Engines::cameraToOffInput()
 {
+	
 	mCapture >> *mFrame;
 	mOffInput.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
 	mOffInput.i32Width = mFrame->cols;
@@ -206,12 +211,13 @@ MRESULT Engines::extractFRFeature()
 	return extractFRFeatureRet;
 }
 
-int Engines::getFaceInputFromBMP()
+int Engines::getFaceModelFromBMP()
 {
 	///* 临时变量 获得本地脸部模型*/
 	ASVLOFFSCREEN offInput1 = { 0 };
 	offInput1.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
 	offInput1.ppu8Plane[0] = nullptr;
+
 	readBMP("photo1.bmp", (uint8_t**)&offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
 	if (!offInput1.ppu8Plane[0])
 	{
@@ -225,11 +231,9 @@ int Engines::getFaceInputFromBMP()
 	mFDEngine->FaceDetection(&offInput1, &localFaceRes);
 	localFRInput.lOrient = *(localFaceRes->lfaceOrient);
 	localFRInput.rcFace = *(localFaceRes->rcFace);	
-	localFRInput.lOrient = *(localFaceRes->lfaceOrient);
-	localFRInput.rcFace = *(localFaceRes->rcFace);
 	
 	AFR_FSDK_FACEMODEL localFaceModel = { 0 };
-	AFR_FSDK_FACEMODEL LocalFaceModels = { 0 };
+	
 
 	extractFRFeatureRet = mFREngine->ExtractFRFeature(&offInput1, &localFRInput, &localFaceModel);
 	if (extractFRFeatureRet != MOK)
@@ -237,12 +241,47 @@ int Engines::getFaceInputFromBMP()
 		return extractFRFeatureRet;
 	}
 	LocalFaceModels.lFeatureSize = localFaceModel.lFeatureSize;
+
+	/* 可能引发内存泄漏 */
 	LocalFaceModels.pbFeature = (MByte*)malloc(localFaceModel.lFeatureSize);
 	memcpy(LocalFaceModels.pbFeature, localFaceModel.pbFeature, localFaceModel.lFeatureSize);
 
-	//AFR_FSDK_FACEINPUT tempFaceResult;
-	//AFR_FSDK_FACEMODEL tempFaceModels = { 0 };
-	//MFloat  fSimilScore = 0.0f;
+	return 0;
+}
+
+int Engines::getVideoFaceModel()
+{
+	if (faceTrackingRet != MOK)
+	{
+		return -1;
+	}
+
+	AFR_FSDK_FACEINPUT videoFRInput;
+	videoFRInput.lOrient = mFaceRes->lfaceOrient;
+	videoFRInput.rcFace = *(mFaceRes->rcFace);
+
+	AFR_FSDK_FACEMODEL videoFaceModel = { 0 };
+	
+	extractFRFeatureRet = mFREngine->ExtractFRFeature(&mOffInput, &videoFRInput, &videoFaceModel);
+	if (extractFRFeatureRet != MOK)
+	{
+		return extractFRFeatureRet;
+	}
+
+	videoFaceModels.lFeatureSize = videoFaceModel.lFeatureSize;
+	
+	/* 引发内存泄漏点，未处理*/
+	videoFaceModels.pbFeature = (MByte*)malloc(videoFaceModel.lFeatureSize);
+	memcpy(videoFaceModels.pbFeature, videoFaceModel.pbFeature, videoFaceModel.lFeatureSize);
+
+
+	return 0;
+}
+
+int Engines::faceRecognitionOneToOne()
+{
+	facePairMatchingRet =  mFREngine->FacePairMatching(&LocalFaceModels, &videoFaceModels, &tempFimiliar);
+	return facePairMatchingRet;
 }
 
 void Engines::drawFaceRect()

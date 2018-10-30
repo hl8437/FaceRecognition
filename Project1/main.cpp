@@ -42,15 +42,20 @@ int main() {
 	/* 摄像头 */
 	engines.initCamera();
 
-
+	engines.getFaceModelFromBMP();
 	std::cout << "进入主功能" << std::endl;
 	cv::waitKey(1000);
-	/* 主功能实现 66666666666*/
+	/* 主功能实现 */
 	while (true)
 	{
 		
 		engines.cameraToOffInput();
 		engines.faceTracking();
+		
+		engines.getVideoFaceModel();
+		engines.faceRecognitionOneToOne();
+		
+		std::cout << engines.tempFimiliar << std::endl;
 		engines.showVideo();
 
 		if (cv::waitKey(30) >= 0)
