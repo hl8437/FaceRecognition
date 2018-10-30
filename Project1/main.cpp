@@ -21,148 +21,127 @@
 #define INPUT_IMAGE_PATH "temp.bmp"
 
 
+int modelSizeAnalyze() {
+	/*
+	结论：
+	1. 脸大脸小不影响
+	2. bmp图像不能过大
+	3. bmp图像在一定大小内不影响faceModel大小
+
+	4.双人图不影响结果
+
+	推理：22020 byte -> 22K以内
+	*/
+
+	Engines engines;
+	engines.enginesInit();
+	/* 900K图片，脸大小不同 */
+	const char* path1 = "huanglei.bmp";				// 中小脸
+	const char* path2 = "huangleiMiddleFace.bmp";	// 中脸
+	const char* path3 = "huangleiBigFace.bmp";		// 大脸
+	/* 500K图片 */
+	const char* path4 = "netPhoto1.bmp";
+	/* 3M 图像*/
+	const char* path5 = "xiaoyang.bmp";
+	/*1.5M*/
+	const char* path6 = "xiaoyang720.bmp";
+	/*22M*/
+	const char* path7 = "huanglei22M.bmp";
+
+	AFR_FSDK_FACEMODEL faceModel1 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel2 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel3 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel4 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel5 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel6 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel7 = { 0 };
+	faceModel1 = engines.getFaceModelFromBMP(path1);
+	faceModel2 = engines.getFaceModelFromBMP(path2);
+	faceModel3 = engines.getFaceModelFromBMP(path3);
+	faceModel4 = engines.getFaceModelFromBMP(path4);
+	faceModel5 = engines.getFaceModelFromBMP(path5);
+	faceModel6 = engines.getFaceModelFromBMP(path6);
+	faceModel7 = engines.getFaceModelFromBMP(path7);
+	std::cout << faceModel1.lFeatureSize << std::endl;
+	std::cout << faceModel2.lFeatureSize << std::endl;
+	std::cout << faceModel3.lFeatureSize << std::endl;
+	std::cout << faceModel4.lFeatureSize << std::endl;
+	std::cout << faceModel5.lFeatureSize << std::endl;
+	std::cout << faceModel6.lFeatureSize << std::endl;
+	std::cout << faceModel7.lFeatureSize << std::endl;
+	std::cout << "sizeof(int):" << sizeof(int) << std::endl;
+	std::cout << "sizeof(MByte):" << sizeof(MByte) << std::endl;
+	std::cout << "sizeof(MInt)" << sizeof(MInt32) << std::endl;
+
+	const char* path8 = "netPhoto3.bmp";
+	AFR_FSDK_FACEMODEL faceModel8 = { 0 };
+	faceModel8 = engines.getFaceModelFromBMP(path8);
+	std::cout << "twoManInABmp" <<faceModel8.lFeatureSize << std::endl;
+	return 0;
+
+}
+
+int timeAnalyzeOf11Recognition() {
+	Engines engines;
+	engines.enginesInit();
+	const char* path1 = "huanglei.bmp";				// 中小脸
+	const char* path2 = "huangleiMiddleFace.bmp";	// 中脸
+
+	AFR_FSDK_FACEMODEL faceModel1 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel2 = { 0 };
+}
 
 int main() {
 
-	/* 声明engine */
-	MRESULT nRet = MERR_UNKNOWN;
-	Engines engines;
-	
-	/* engines 初始化 */
-	nRet = engines.enginesInit();
-	if (!nRet == MOK)
-	{
-		std::cout << "初始化引擎失败" << std::endl;
-		return nRet;
-	}
-
-	/* engines 人脸资源变量初始化 */
-	engines.initFaceVariables();
-
-	/* 摄像头 */
-	engines.initCamera();
-
-	engines.getFaceModelFromBMP();
-	std::cout << "进入主功能" << std::endl;
-	cv::waitKey(1000);
-	/* 主功能实现 */
-	while (true)
-	{
-		
-		engines.cameraToOffInput();
-		engines.faceTracking();
-		
-		engines.getVideoFaceModel();
-		engines.faceRecognitionOneToOne();
-		
-		std::cout << engines.tempFimiliar << std::endl;
-		engines.showVideo();
-
-		if (cv::waitKey(30) >= 0)
-		{
-			break;
-		}
-
-		///* Very important */
-		//free(offInput.ppu8Plane[0]);
-	}
-	
-	/*capture.release();*/
+	modelSizeAnalyze();
+	getchar();
 	return 0;
 }
 
 
-///* 获得性别评估输入 FaceRes */
-////genderFaceInput 与 FaceResult 类型可转换
-//genderFaceInput.lFaceNumber = FaceRes->nFace;
-//genderFaceInput.pFaceRectArray = FaceRes->rcFace;
-//genderFaceInput.pFaceOrientArray = &(FaceRes->lfaceOrient);
-
-///* 获得年龄评估输入 */
-
+//int test() {
+//	/* 声明engine */
+//	MRESULT nRet = MERR_UNKNOWN;
+//	Engines engines;
 //
-///* 获得对比输入 */
-//tempFaceResult.lOrient = FaceRes->lfaceOrient;
-//tempFaceResult.rcFace = *(FaceRes->rcFace);
-
-////获得genderResult
-//genderEngine.GenderEstimationPreview(&offInput, &genderFaceInput, &genderResult);
-//ageEngine.AgeEstimationPreview(&offInput, &ageFaceInput, &ageResult);
-//
-//AFR_FSDK_FACEMODEL LocalFaceModels = { 0 };
-//nRet = frEngine.ExtractFRFeature(&offInput, &tempFaceResult, &LocalFaceModels);
-//if (nRet != MOK)
-//{
-//	//fprintf(stderr, "fail to Extract 2nd FR Feature, error code: %d\r\n", nRet);
-//}
-//tempFaceModels.lFeatureSize = LocalFaceModels.lFeatureSize;
-//tempFaceModels.pbFeature = (MByte*)malloc(tempFaceModels.lFeatureSize);
-//memcpy(tempFaceModels.pbFeature, LocalFaceModels.pbFeature, tempFaceModels.lFeatureSize);
-
-//nRet = frEngine.FacePairMatching(&localFaceModels1, &tempFaceModels, &fSimilScore);
-//if (nRet == MOK)
-//{
-//	//fprintf(stdout, "fSimilScore =  %f\r\n", fSimilScore);
-//}
-//else {
-//	//fprintf(stderr, "FacePairMatching failed , errorcode is %d \r\n", nRet);
-//}
-
-
-//if (nRet == MOK)
-//{
-//	//fprintf(stdout, "The number of face: %d\r\n", FaceRes->nFace);
-//	for (int i = 0; i < FaceRes->nFace; ++i)
+//	/* engines 初始化 */
+//	nRet = engines.enginesInit();
+//	if (!nRet == MOK)
 //	{
-//		//在视频上画出矩形
-//		cv::rectangle(frame, CvPoint(FaceRes->rcFace[i].left, FaceRes->rcFace[i].top), CvPoint(FaceRes->rcFace[i].right, FaceRes->rcFace[i].bottom), CvScalar(255, 0, 0), 2);
-//		
-//		//在矩形底部打印信息
-//		sprintf(age, "%d", ageResult.pAgeResultArray[i]);
-//		info = "name:" + name + "sex" + sex[genderResult.pGenderResultArray[i] + 1] + "age" + age;
-//		//strcpy(info, "name:%csex:%c\tage:%d", "huanglei", "male", ageResult.pAgeResultArray[i]);
-//		cv::putText(frame, info, CvPoint(FaceRes->rcFace[i].left, FaceRes->rcFace[i].bottom), cv::FONT_HERSHEY_COMPLEX, 0.6, cv::Scalar(255, 0, 0));
+//		std::cout << "初始化引擎失败" << std::endl;
+//		return nRet;
 //	}
-//}
-//else
-//{
-//	//fprintf(stderr, "Face Detection failed, error code: %d\r\n", nRet);
-//}
 //
-//cv::imshow("video", frame);
-
-
-	///* 临时变量 获得本地脸部模型*/
-	//ASVLOFFSCREEN offInput1 = { 0 };
-	//offInput1.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
-	//offInput1.ppu8Plane[0] = nullptr;
-	//readBMP("photo1.bmp", (uint8_t**)&offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
-	//if (!offInput1.ppu8Plane[0])
-	//{
-	//	fprintf(stderr, "fail to ReadBmp(%s)\r\n", "photo1.bmp");
-	//	return -1;
-	//}
-	//offInput1.pi32Pitch[0] = offInput1.i32Width * 3;
-	//
-	//LPAFD_FSDK_FACERES localFaceRes1 = nullptr;
-	//AFR_FSDK_FACEINPUT localFaceResult;
-	//fdEngine.FaceDetection(&offInput1, &localFaceRes1);
-	//localFaceResult.lOrient = *(localFaceRes1->lfaceOrient);
-	//localFaceResult.rcFace = *(localFaceRes1->rcFace);	
-	//localFaceResult.lOrient = *(localFaceRes1->lfaceOrient);
-	//localFaceResult.rcFace = *(localFaceRes1->rcFace);
-	//AFR_FSDK_FACEMODEL localFaceModels1 = { 0 };
-	//AFR_FSDK_FACEMODEL LocalFaceModels = { 0 };
-
-	//nRet = frEngine.ExtractFRFeature(&offInput1, &localFaceResult, &LocalFaceModels);
-	//if (nRet != MOK)
-	//{
-	//	fprintf(stderr, "fail to Extract 1st FR Feature, errorcode: %d\r\n", nRet);
-	//}
-	//localFaceModels1.lFeatureSize = LocalFaceModels.lFeatureSize;
-	//localFaceModels1.pbFeature = (MByte*)malloc(localFaceModels1.lFeatureSize);
-	//memcpy(localFaceModels1.pbFeature, LocalFaceModels.pbFeature, localFaceModels1.lFeatureSize);
-
-	//AFR_FSDK_FACEINPUT tempFaceResult;
-	//AFR_FSDK_FACEMODEL tempFaceModels = { 0 };
-	//MFloat  fSimilScore = 0.0f;
+//	/* engines 人脸资源变量初始化 */
+//	engines.initFaceVariables();
+//
+//	/* 摄像头 */
+//	engines.initCamera();
+//
+//	engines.getFaceModelFromBMP();
+//	std::cout << "进入主功能" << std::endl;
+//	cv::waitKey(1000);
+//	/* 主功能实现 */
+//	while (true)
+//	{
+//		engines.cameraToOffInput();
+//		engines.faceTracking();
+//
+//		engines.getVideoFaceModel();
+//		engines.faceRecognitionOneToOne();
+//
+//		std::cout << engines.tempFimiliar << std::endl;
+//		engines.showVideo();
+//
+//		if (cv::waitKey(30) >= 0)
+//		{
+//			break;
+//		}
+//
+//		///* Very important */
+//		//free(offInput.ppu8Plane[0]);
+//	}
+//
+//	engines.releaseCamera();
+//	return 0;
+//}

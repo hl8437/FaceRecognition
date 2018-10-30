@@ -151,6 +151,14 @@ int Engines::initCamera()
 	return 0;
 }
 
+void Engines::releaseCamera()
+{
+	if (mCapture.isOpened())
+	{
+		mCapture.release();
+	}
+}
+
 int Engines::initRet()
 {
 	faceTrackingRet = MERR_UNKNOWN;
@@ -211,19 +219,14 @@ MRESULT Engines::extractFRFeature()
 	return extractFRFeatureRet;
 }
 
-int Engines::getFaceModelFromBMP()
+AFR_FSDK_FACEMODEL Engines::getFaceModelFromBMP(const char * path)
 {
 	///* 临时变量 获得本地脸部模型*/
 	ASVLOFFSCREEN offInput1 = { 0 };
 	offInput1.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
 	offInput1.ppu8Plane[0] = nullptr;
 
-	readBMP("photo1.bmp", (uint8_t**)&offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
-	if (!offInput1.ppu8Plane[0])
-	{
-		fprintf(stderr, "fail to ReadBmp(%s)\r\n", "photo1.bmp");
-		return -1;
-	}
+	readBMP(path, (uint8_t**)&offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
 	offInput1.pi32Pitch[0] = offInput1.i32Width * 3;
 	
 	LPAFD_FSDK_FACERES localFaceRes = nullptr;
@@ -236,17 +239,19 @@ int Engines::getFaceModelFromBMP()
 	
 
 	extractFRFeatureRet = mFREngine->ExtractFRFeature(&offInput1, &localFRInput, &localFaceModel);
-	if (extractFRFeatureRet != MOK)
-	{
-		return extractFRFeatureRet;
-	}
-	LocalFaceModels.lFeatureSize = localFaceModel.lFeatureSize;
+	return localFaceModel;
+	//if (extractFRFeatureRet != MOK)
+	//{
+	//	return extractFRFeatureRet;
+	//}
+	//LocalFaceModels.lFeatureSize = localFaceModel.lFeatureSize;
 
-	/* 可能引发内存泄漏 */
-	LocalFaceModels.pbFeature = (MByte*)malloc(localFaceModel.lFeatureSize);
-	memcpy(LocalFaceModels.pbFeature, localFaceModel.pbFeature, localFaceModel.lFeatureSize);
+	///* 可能引发内存泄漏 */
+	//free(LocalFaceModels.pbFeature);
+	//LocalFaceModels.pbFeature = (MByte*)malloc(localFaceModel.lFeatureSize);
+	//memcpy(LocalFaceModels.pbFeature, localFaceModel.pbFeature, localFaceModel.lFeatureSize);
 
-	return 0;
+	//return 0;
 }
 
 int Engines::getVideoFaceModel()
@@ -271,6 +276,7 @@ int Engines::getVideoFaceModel()
 	videoFaceModels.lFeatureSize = videoFaceModel.lFeatureSize;
 	
 	/* 引发内存泄漏点，未处理*/
+	free(videoFaceModels.pbFeature);
 	videoFaceModels.pbFeature = (MByte*)malloc(videoFaceModel.lFeatureSize);
 	memcpy(videoFaceModels.pbFeature, videoFaceModel.pbFeature, videoFaceModel.lFeatureSize);
 

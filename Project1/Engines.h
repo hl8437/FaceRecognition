@@ -56,27 +56,23 @@ public:
 	~Engines();
 	int enginesInit();			// 初始化引擎
 	int enginesClose();			// 释放引擎
-	
-	int initFaceVariables();		// 初始化人脸检测相关变量
+
 	int initCamera();				// 打开摄像头,获取摄像宽高,初始化mFrame
-	int initRet();
+	void releaseCamera();			// 关闭摄像头
 
-	int cameraToOffInput();			// mCapture -> mFrame -> offinput
-	MRESULT faceTracking();			// 跟踪人脸信息, 并将结果输入至mFaceRes
-	void getGenderFaceInput();		// 用mFaceRes初始化mGenderFaceInput
-	void getAgeFaceInput();
-
-	/* 对于FaceRes包含多张人脸的结果，效果未确定 */
-	void getFRFaceInput();
-
-	MRESULT extractFRFeature();
-
-	int getFaceModelFromBMP();
-	int getVideoFaceModel();
-
-	int faceRecognitionOneToOne();
-
+	int initRet();					// 初始化几个ret
+	int initFaceVariables();		// 初始化人脸检测相关变量
 	
+	int cameraToOffInput();			// mCapture -> mFrame -> mOffinput
+	MRESULT faceTracking();			// 跟踪人脸信息, 从OffInput检测人脸，并将结果输入至mFaceRes
+	void getGenderFaceInput();		// 从mFaceRes获得mGenderFaceInput
+	void getAgeFaceInput();			// 从mFaceRes获得mAgeFaceInput
+	/* 对于FaceRes包含多张人脸的结果，效果未确定 */
+	void getFRFaceInput();			// 从mFaceRes获得mFRFaceInput
+	MRESULT extractFRFeature();		// 从mOffInput以及mFaceRes，将Model存至mFRFaceModel
+	AFR_FSDK_FACEMODEL getFaceModelFromBMP(const char* path);		// 从本地BMP获取Model，存储至LocalFaceModels
+	int getVideoFaceModel();		// 从mOffInput和mFaceRes获取Model，存储至VideoFaceModel,转存至videoFaceModels
+	int faceRecognitionOneToOne();	// 两个Model的比对
 	void drawFaceRect();			// 人脸框绘制函数
 
 	void showVideo();				// 视频显示
