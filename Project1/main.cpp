@@ -1,22 +1,9 @@
-#include <iostream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include "const.h"
-#include "FTEngine.h"
-#include "AgeEngine.h"
-#include "ReadBMP.h"
 #include "Engines.h"
-#include <stdlib.h>
-//#include "SQLEngine.h"
-#include "ammem.h"
-#include <string>
+#include <iostream>
+#include <windows.h>
 
-#pragma comment(lib,"libarcsoft_fsdk_face_detection.lib")
-#pragma comment(lib, "libarcsoft_fsdk_face_tracking.lib")
-#pragma comment(lib,"libarcsoft_fsdk_age_estimation.lib")
-#pragma comment(lib,"libarcsoft_fsdk_face_recognition.lib")
-#pragma comment(lib,"libarcsoft_fsdk_gender_estimation.lib")
+#include <opencv.hpp>
+
 
 #define INPUT_IMAGE_PATH "temp.bmp"
 
@@ -55,13 +42,15 @@ int modelSizeAnalyze() {
 	AFR_FSDK_FACEMODEL faceModel5 = { 0 };
 	AFR_FSDK_FACEMODEL faceModel6 = { 0 };
 	AFR_FSDK_FACEMODEL faceModel7 = { 0 };
-	faceModel1 = engines.getFaceModelFromBMP(path1);
-	faceModel2 = engines.getFaceModelFromBMP(path2);
-	faceModel3 = engines.getFaceModelFromBMP(path3);
-	faceModel4 = engines.getFaceModelFromBMP(path4);
-	faceModel5 = engines.getFaceModelFromBMP(path5);
-	faceModel6 = engines.getFaceModelFromBMP(path6);
-	faceModel7 = engines.getFaceModelFromBMP(path7);
+
+	ASVLOFFSCREEN offInput1 = { 0 };
+	faceModel1 = engines.getFaceModelFromBMP(path1, &offInput1);
+	faceModel2 = engines.getFaceModelFromBMP(path2, &offInput1);
+	faceModel3 = engines.getFaceModelFromBMP(path3, &offInput1);
+	faceModel4 = engines.getFaceModelFromBMP(path4, &offInput1);
+	faceModel5 = engines.getFaceModelFromBMP(path5, &offInput1);
+	faceModel6 = engines.getFaceModelFromBMP(path6, &offInput1);
+	faceModel7 = engines.getFaceModelFromBMP(path7, &offInput1);
 	std::cout << faceModel1.lFeatureSize << std::endl;
 	std::cout << faceModel2.lFeatureSize << std::endl;
 	std::cout << faceModel3.lFeatureSize << std::endl;
@@ -75,25 +64,139 @@ int modelSizeAnalyze() {
 
 	const char* path8 = "netPhoto3.bmp";
 	AFR_FSDK_FACEMODEL faceModel8 = { 0 };
-	faceModel8 = engines.getFaceModelFromBMP(path8);
+	faceModel8 = engines.getFaceModelFromBMP(path8, &offInput1);
 	std::cout << "twoManInABmp" <<faceModel8.lFeatureSize << std::endl;
 	return 0;
 
 }
 
 int timeAnalyzeOf11Recognition() {
+	//1:1时间分析	
+	//十万次			ms
+	// 同人同照			10906
+	// 同人不同照		10859
+	// 不同人			10860
 	Engines engines;
 	engines.enginesInit();
-	const char* path1 = "huanglei.bmp";				// 中小脸
-	const char* path2 = "huangleiMiddleFace.bmp";	// 中脸
+	const char* path1 = "huanglei.bmp";				
+	const char* path2 = "netPhoto1.bmp";	
 
 	AFR_FSDK_FACEMODEL faceModel1 = { 0 };
 	AFR_FSDK_FACEMODEL faceModel2 = { 0 };
+
+	ASVLOFFSCREEN offInput;
+	offInput = { 0 };
+	
+	faceModel1 = engines.getFaceModelFromBMP(path1, &offInput);
+	
+	faceModel2 = engines.getFaceModelFromBMP(path2, &offInput);
+
+	MFloat fimiliarScore;
+	std::cout << "click to start" << std::endl;
+	getchar();
+	std::cout << "开始" << std::endl;
+	double start = GetTickCount();
+	for (int i = 0; i < 10000; i++)
+	{
+		engines.faceRecognition(&faceModel1, &faceModel2, &fimiliarScore);
+	}
+	double end = GetTickCount();
+	std::cout << "over" << std::endl;
+	std::cout << "Time consume of 11 recognition is	" << end - start << "ms?" << std::endl;
+	return 0;
+	
+}
+
+int timeAnalyzeOfExtractModelFromOffInput() {
+
+	// 千万分之一秒级别
+
+	Engines engines;
+	engines.enginesInit();
+	/* 900K图片，脸大小不同 */
+	const char* path1 = "huanglei.bmp";				// 中小脸
+	const char* path2 = "huangleiMiddleFace.bmp";	// 中脸
+	const char* path3 = "huangleiBigFace.bmp";		// 大脸
+	/* 500K图片 */
+	const char* path4 = "netPhoto1.bmp";
+	/* 3M 图像*/
+	const char* path5 = "xiaoyang.bmp";
+	/*1.5M*/
+	const char* path6 = "xiaoyang720.bmp";
+	/*22M*/
+	const char* path7 = "huanglei22M.bmp";
+
+	ASVLOFFSCREEN offInput1 = { 0 };
+	AFR_FSDK_FACEMODEL faceModel1 = { 0 };
+	offInput1.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
+	offInput1.ppu8Plane[0] = nullptr;
+	readBMP(path2, &offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
+
+	LPAFT_FSDK_FACERES faceRes;
+	engines.faceTracking(&offInput1, &faceRes);
+	AFR_FSDK_FACEINPUT frinput = { 0 };
+	engines.getFRFaceInput(faceRes, &frinput);
+
+	double start = GetTickCount();
+	for (double i = 0; i < 1000; i++)
+	{
+		engines.extractFRFeature(&offInput1, &frinput, &faceModel1);
+	}
+		
+	double end = GetTickCount();
+	std::cout << end - start << std::endl;
+	
+	return 0;
+
+}
+
+int timeAnalyzeOfCaptureToOffInput() {
+
+	// 本机 capture>>frame 10次 328ms  100次3296
+	// 本机capture帧率 30
+	// engines.cameraToOffInput(&capture, &frame, &offInput); 100次 4781ms
+
+	// 从offinput-》faceRes 万分之一秒级别
+
+
+	cv::VideoCapture capture;
+	cv::Mat frame;
+	Engines engines;
+	engines.enginesInit();
+	ASVLOFFSCREEN offInput;
+	LPAFT_FSDK_FACERES pFaceRes;
+
+	capture.open(0);
+	if (!capture.isOpened())
+	{
+		std::cout << "摄像头未打开" << std::endl;
+		return -1;
+	}
+	double fps = capture.get(CV_CAP_PROP_FPS);
+	std::cout << fps << std::endl;
+	
+	engines.cameraToOffInput(&capture, &frame, &offInput);
+	
+	std::cout << offInput.i32Height << std::endl;
+	std::cout << offInput.i32Width << std::endl;
+
+	double start = GetTickCount();
+	std::cout << "kaishi" << std::endl;
+	for (int i = 0; i < 1000000; i++)
+	{	
+		pFaceRes = new AFT_FSDK_FACERES;
+		engines.faceTracking(&offInput, &pFaceRes);
+		free(pFaceRes);
+	}
+	double end = GetTickCount();
+	std::cout << end - start << std::endl;
+	return 0;
+
 }
 
 int main() {
-
-	modelSizeAnalyze();
+	
+	timeAnalyzeOfCaptureToOffInput();
 	getchar();
 	return 0;
 }

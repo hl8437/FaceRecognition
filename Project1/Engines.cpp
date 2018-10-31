@@ -151,6 +151,17 @@ int Engines::initCamera()
 	return 0;
 }
 
+int Engines::closeCamera()
+{
+	if (!mCapture.isOpened())
+	{
+		std::cout << "摄像头处于关闭状态" << std::endl;
+		return 0;
+	}
+	mCapture.release();
+	return 0;
+}
+
 void Engines::releaseCamera()
 {
 	if (mCapture.isOpened())
@@ -166,22 +177,28 @@ int Engines::initRet()
 	return 0;
 }
 
-int Engines::cameraToOffInput()
+int Engines::cameraToOffInput(cv::VideoCapture* capture,cv::Mat* mFrame, LPASVLOFFSCREEN mOffInput)
 {
 	
-	mCapture >> *mFrame;
-	mOffInput.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
-	mOffInput.i32Width = mFrame->cols;
-	mOffInput.i32Height = mFrame->rows;
-	mOffInput.ppu8Plane[0] = mFrame->data;
-	mOffInput.pi32Pitch[0] = mOffInput.i32Width * 3;
+	*capture >> *mFrame;
+	mOffInput->u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
+	mOffInput->i32Width = mFrame->cols;
+	mOffInput->i32Height = mFrame->rows;
+	mOffInput->ppu8Plane[0] = mFrame->data;
+	mOffInput->pi32Pitch[0] = mOffInput->i32Width * 3;
 	return 0;
 }
 
-MRESULT Engines::faceTracking()
+MRESULT Engines::faceTracking(LPASVLOFFSCREEN pImgData, LPAFT_FSDK_FACERES *pFaceRes)
 {
-	faceTrackingRet = mFTEngine->FaceTracking(&mOffInput, &mFaceRes);
+	faceTrackingRet = mFTEngine->FaceTracking(pImgData, pFaceRes);
 	return faceTrackingRet;
+}
+
+MRESULT Engines::faceDetect(LPASVLOFFSCREEN pImgData, LPAFT_FSDK_FACERES * pFaceRes)
+{
+	faceDetectRet = mFTEngine->FaceTracking(pImgData, pFaceRes);
+	return faceDetectRet;
 }
 
 void Engines::getGenderFaceInput()
@@ -204,41 +221,40 @@ void Engines::getAgeFaceInput()
 	}
 }
 
-void Engines::getFRFaceInput()
+void Engines::getFRFaceInput(LPAFT_FSDK_FACERES FaceRes, AFR_FSDK_FACEINPUT* FRFaceInput)
 {
 	if (faceTrackingRet == MOK)
 	{
-		mFRFaceInput.lOrient = mFaceRes->lfaceOrient;
-		mFRFaceInput.rcFace = *mFaceRes->rcFace;
+		FRFaceInput->lOrient = FaceRes->lfaceOrient;
+		FRFaceInput->rcFace = *FaceRes->rcFace;
 	}
 }
 
-MRESULT Engines::extractFRFeature()
+MRESULT Engines::extractFRFeature(LPASVLOFFSCREEN pImgData, LPAFR_FSDK_FACEINPUT pFaceRes, LPAFR_FSDK_FACEMODEL pFaceModels)
 {
-	extractFRFeatureRet = mFREngine->ExtractFRFeature(&mOffInput, &mFRFaceInput, &mFRFaceModel);
+	extractFRFeatureRet = mFREngine->ExtractFRFeature(pImgData, pFaceRes, pFaceModels);
 	return extractFRFeatureRet;
 }
 
-AFR_FSDK_FACEMODEL Engines::getFaceModelFromBMP(const char * path)
+AFR_FSDK_FACEMODEL Engines::getFaceModelFromBMP(const char * path, ASVLOFFSCREEN* offInput1)
 {
 	///* 临时变量 获得本地脸部模型*/
-	ASVLOFFSCREEN offInput1 = { 0 };
-	offInput1.u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
-	offInput1.ppu8Plane[0] = nullptr;
+	offInput1->u32PixelArrayFormat = ASVL_PAF_RGB24_B8G8R8;
+	offInput1->ppu8Plane[0] = nullptr;
 
-	readBMP(path, (uint8_t**)&offInput1.ppu8Plane[0], &offInput1.i32Width, &offInput1.i32Height);
-	offInput1.pi32Pitch[0] = offInput1.i32Width * 3;
+	readBMP(path, (uint8_t**)&offInput1->ppu8Plane[0], &offInput1->i32Width, &offInput1->i32Height);
+	offInput1->pi32Pitch[0] = offInput1->i32Width * 3;
 	
 	LPAFD_FSDK_FACERES localFaceRes = nullptr;
 	AFR_FSDK_FACEINPUT localFRInput;
-	mFDEngine->FaceDetection(&offInput1, &localFaceRes);
+	mFDEngine->FaceDetection(offInput1, &localFaceRes);
 	localFRInput.lOrient = *(localFaceRes->lfaceOrient);
 	localFRInput.rcFace = *(localFaceRes->rcFace);	
 	
 	AFR_FSDK_FACEMODEL localFaceModel = { 0 };
 	
 
-	extractFRFeatureRet = mFREngine->ExtractFRFeature(&offInput1, &localFRInput, &localFaceModel);
+	extractFRFeatureRet = mFREngine->ExtractFRFeature(offInput1, &localFRInput, &localFaceModel);
 	return localFaceModel;
 	//if (extractFRFeatureRet != MOK)
 	//{
@@ -284,9 +300,9 @@ int Engines::getVideoFaceModel()
 	return 0;
 }
 
-int Engines::faceRecognitionOneToOne()
+int Engines::faceRecognition(AFR_FSDK_FACEMODEL *reffeature, AFR_FSDK_FACEMODEL *probefeature, MFloat *pfSimilScore)
 {
-	facePairMatchingRet =  mFREngine->FacePairMatching(&LocalFaceModels, &videoFaceModels, &tempFimiliar);
+	facePairMatchingRet =  mFREngine->FacePairMatching(reffeature, probefeature, pfSimilScore);
 	return facePairMatchingRet;
 }
 

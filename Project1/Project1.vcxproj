@@ -152,6 +152,7 @@
     <ResourceCompile Include="Project1.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="huangleiBigFace.bmp" />
     <Image Include="photo1.bmp" />
     <Image Include="photo2.bmp" />
     <Image Include="temp.bmp" />

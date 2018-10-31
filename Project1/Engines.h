@@ -48,8 +48,10 @@ public:
 
 
 	MRESULT faceTrackingRet;		// 检测人脸函数返回值
+	MRESULT faceDetectRet;	// 人脸比对返回值
 	MRESULT extractFRFeatureRet;	// 模型提取返回值
 	MRESULT facePairMatchingRet;	// 人脸比对返回值
+
 
 public:
 	Engines();
@@ -58,21 +60,23 @@ public:
 	int enginesClose();			// 释放引擎
 
 	int initCamera();				// 打开摄像头,获取摄像宽高,初始化mFrame
+	int closeCamera();
 	void releaseCamera();			// 关闭摄像头
 
 	int initRet();					// 初始化几个ret
 	int initFaceVariables();		// 初始化人脸检测相关变量
 	
-	int cameraToOffInput();			// mCapture -> mFrame -> mOffinput
-	MRESULT faceTracking();			// 跟踪人脸信息, 从OffInput检测人脸，并将结果输入至mFaceRes
+	int cameraToOffInput(cv::VideoCapture* capture, cv::Mat* mFrame, LPASVLOFFSCREEN mOffInput);			// mCapture -> mFrame -> mOffinput
+	MRESULT faceTracking(LPASVLOFFSCREEN pImgData, LPAFT_FSDK_FACERES *pFaceRes);// 跟踪人脸信息, 从OffInput检测人脸，并将结果输入至mFaceRes
+	MRESULT faceDetect(LPASVLOFFSCREEN pImgData, LPAFT_FSDK_FACERES *pFaceRes);
 	void getGenderFaceInput();		// 从mFaceRes获得mGenderFaceInput
 	void getAgeFaceInput();			// 从mFaceRes获得mAgeFaceInput
 	/* 对于FaceRes包含多张人脸的结果，效果未确定 */
-	void getFRFaceInput();			// 从mFaceRes获得mFRFaceInput
-	MRESULT extractFRFeature();		// 从mOffInput以及mFaceRes，将Model存至mFRFaceModel
-	AFR_FSDK_FACEMODEL getFaceModelFromBMP(const char* path);		// 从本地BMP获取Model，存储至LocalFaceModels
+	void getFRFaceInput(LPAFT_FSDK_FACERES FaceRes, AFR_FSDK_FACEINPUT* FRFaceInput);			// 从mFaceRes获得mFRFaceInput
+	MRESULT extractFRFeature(LPASVLOFFSCREEN pImgData, LPAFR_FSDK_FACEINPUT pFaceRes, LPAFR_FSDK_FACEMODEL pFaceModels);		// 从mOffInput以及mFaceRes，将Model存至mFRFaceModel
+	AFR_FSDK_FACEMODEL getFaceModelFromBMP(const char * path, ASVLOFFSCREEN* offInput1);		// 从本地BMP获取Model，存储至LocalFaceModels
 	int getVideoFaceModel();		// 从mOffInput和mFaceRes获取Model，存储至VideoFaceModel,转存至videoFaceModels
-	int faceRecognitionOneToOne();	// 两个Model的比对
+	int faceRecognition(AFR_FSDK_FACEMODEL *reffeature, AFR_FSDK_FACEMODEL *probefeature, MFloat *pfSimilScore);	// 两个Model的比对
 	void drawFaceRect();			// 人脸框绘制函数
 
 	void showVideo();				// 视频显示
